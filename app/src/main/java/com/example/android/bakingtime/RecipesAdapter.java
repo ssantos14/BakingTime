@@ -18,7 +18,6 @@ import butterknife.ButterKnife;
 
 public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeViewHolder>{
     private Cursor mRecipesDataCursor;
-    private final Context mContext;
     final private ListItemClickListener mOnClickListener;
 
     public void setRecipeDataCursor(Cursor recipesData){
@@ -26,8 +25,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
         notifyDataSetChanged();
     }
 
-    public RecipesAdapter(@NonNull Context context, ListItemClickListener listener){
-        mContext = context;
+    public RecipesAdapter(ListItemClickListener listener){
         mOnClickListener = listener;
     }
 
@@ -76,6 +74,5 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
     public interface ListItemClickListener{
         void onListItemClick(int clickedItemIndex,String[] recipeArray);
     }
-
 
 }
