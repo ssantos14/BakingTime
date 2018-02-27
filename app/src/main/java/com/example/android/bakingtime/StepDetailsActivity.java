@@ -93,8 +93,6 @@ public class StepDetailsActivity extends AppCompatActivity implements LoaderMana
             restartThisActivityIntent.putExtra(RecipeDetailsActivity.START_ID_TAG, firstId);
             restartThisActivityIntent.putExtra(RecipeDetailsActivity.END_ID_TAG, lastId);
             startActivity(restartThisActivityIntent);
-        }else{
-            Toast.makeText(this,"No more steps",Toast.LENGTH_LONG);
         }
     }
 
@@ -105,8 +103,6 @@ public class StepDetailsActivity extends AppCompatActivity implements LoaderMana
             restartThisActivityIntent.putExtra(RecipeDetailsActivity.START_ID_TAG, firstId);
             restartThisActivityIntent.putExtra(RecipeDetailsActivity.END_ID_TAG, lastId);
             startActivity(restartThisActivityIntent);
-        }else{
-            Toast.makeText(this,"This is the first step",Toast.LENGTH_LONG);
         }
     }
 

@@ -17,7 +17,6 @@ import butterknife.ButterKnife;
 
 public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHolder> {
     private Cursor mStepsCursor;
-    private final Context mContext;
     private final ListItemClickListener mClickListener;
 
     public void setStepsCursor(Cursor stepsCursor){
@@ -25,8 +24,7 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHold
         notifyDataSetChanged();
     }
 
-    public StepsAdapter(Context context, ListItemClickListener listener) {
-        mContext = context;
+    public StepsAdapter(ListItemClickListener listener) {
         mClickListener = listener;
     }
 

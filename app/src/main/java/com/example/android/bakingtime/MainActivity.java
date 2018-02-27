@@ -1,33 +1,25 @@
 package com.example.android.bakingtime;
 
+import android.app.FragmentManager;
 import android.app.LoaderManager;
-import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.res.Configuration;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.example.android.bakingtime.data.RecipesDataContract;
 import com.example.android.bakingtime.sync.SyncRecipesDataIntentService;
+import com.example.android.bakingtime.ui.RecipeDetailsFragment;
+import com.example.android.bakingtime.ui.RecipeListFragment;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import static com.example.android.bakingtime.ui.RecipeListFragment.layoutManager;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,RecipesAdapter.ListItemClickListener{
-
-    @BindView(R.id.recipes_recycler_view) RecyclerView mRecipesRecyclerView;
-    private RecipesAdapter mRecipesAdapter;
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,RecipeListFragment.OnRecipeSelectedListener{
     private static final int RECIPES_LOADER_ID = 29;
     public static final String[] RECIPES_PROJECTION = {
             RecipesDataContract.RecipeEntry.COLUMN_RECIPE_NAME,
@@ -36,26 +28,39 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     };
     public static final String INTENT_TAG = "recipe_info";
     private static final String RECYCLER_VIEW_POSITION = "rv_position";
-    private LinearLayoutManager layoutManager;
     private Parcelable recipesSavedState;
+    private static boolean mTwoPane;
+    public static final int STEPS_LOADER_ID = 776;
+    public static final String[] STEPS_PROJECTION = {
+            RecipesDataContract.StepEntry._ID,
+            RecipesDataContract.StepEntry.COLUMN_RECIPE_NAME,
+            RecipesDataContract.StepEntry.COLUMN_SHORT_DESCRIPTION,
+            RecipesDataContract.StepEntry.COLUMN_DESCRIPTION,
+            RecipesDataContract.StepEntry.COLUMN_VIDEO_URL,
+            RecipesDataContract.StepEntry.COLUMN_THUMBNAIL_URL
+    };
+    private static String recipeName;
+    private static int firstId;
+    private static int lastId;
+    private static String[] mRecipeInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-            layoutManager = new GridLayoutManager(this, 1);
-        }
-        else{
-            layoutManager = new GridLayoutManager(this, 2);
-        }
-        mRecipesRecyclerView.setLayoutManager(layoutManager);
-        mRecipesRecyclerView.setHasFixedSize(true);
-        mRecipesAdapter = new RecipesAdapter(this,this);
-        mRecipesRecyclerView.setAdapter(mRecipesAdapter);
         Intent intentToSyncImmediately = new Intent(this, SyncRecipesDataIntentService.class);
         startService(intentToSyncImmediately);
+        if(findViewById(R.id.divider) != null){
+            mTwoPane = true; //Two pane case
+            Log.d(MainActivity.class.getSimpleName(),"WE ARE IN THE TWO PANE CASE IN ONCREATE");
+            if(savedInstanceState == null) {
+                RecipeDetailsFragment detailsFragment = new RecipeDetailsFragment();
+                FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().add(R.id.details_fragment_container, detailsFragment).commit();
+            }
+        }else{
+            mTwoPane = false; //One pane case
+        }
         getLoaderManager().initLoader(RECIPES_LOADER_ID,null,this);
     }
 
@@ -66,6 +71,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             case RECIPES_LOADER_ID:
                 Uri recipesUri = RecipesDataContract.RecipeEntry.RECIPES_CONTENT_URI;
                 return new CursorLoader(this,recipesUri,RECIPES_PROJECTION,null,null,null);
+            case STEPS_LOADER_ID:
+                Uri stepsUri = RecipesDataContract.StepEntry.STEPS_CONTENT_URI;
+                String selection = "recipe=?";
+                String[] selectionArgs = {recipeName};
+                return new CursorLoader(this,stepsUri,STEPS_PROJECTION,selection,selectionArgs,null);
             default:
                 throw new RuntimeException("Loader not implemented" + loaderId);
         }
@@ -73,20 +83,48 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        mRecipesAdapter.setRecipeDataCursor(cursor);
-        layoutManager.onRestoreInstanceState(recipesSavedState);
+        int loaderId = loader.getId();
+        switch (loaderId){
+            case RECIPES_LOADER_ID:
+                Log.d(MainActivity.class.getSimpleName(),"RECIPE LOADER FINISHED");
+                RecipeListFragment.mRecipesAdapter.setRecipeDataCursor(cursor);
+                layoutManager.onRestoreInstanceState(recipesSavedState);
+                if(MainActivity.mTwoPane){
+                    cursor.moveToFirst();
+                    recipeName = cursor.getString(0);
+                    String servings = cursor.getString(1);
+                    String ingredients = cursor.getString(2);
+                    mRecipeInfo = new String[]{recipeName,servings,ingredients};
+                    getLoaderManager().initLoader(STEPS_LOADER_ID,null,this);
+                }
+                break;
+            case STEPS_LOADER_ID:
+                Log.d(MainActivity.class.getSimpleName(),"STEPS LOADER FINISHED");
+                if(cursor != null && cursor.getCount() != 0) {
+                    cursor.moveToFirst();
+                    firstId = cursor.getInt(0);
+                    cursor.moveToLast();
+                    lastId = cursor.getInt(0);
+                    RecipeDetailsFragment.setRecipeDetailsContents(mRecipeInfo,cursor,firstId,lastId);
+                }
+                break;
+            default:
+                break;
+        }
+
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
-
-    @Override
-    public void onListItemClick(int clickedItemIndex,String[] recipeInfo) {
-        Intent startDetailsActivityIntent = new Intent(this, RecipeDetailsActivity.class);
-        startDetailsActivityIntent.putExtra(INTENT_TAG,recipeInfo);
-        startActivity(startDetailsActivityIntent);
+        int loaderId = loader.getId();
+        switch (loaderId){
+            case RECIPES_LOADER_ID:
+                RecipeListFragment.mRecipesAdapter.setRecipeDataCursor(null);
+            case STEPS_LOADER_ID:
+                RecipeDetailsFragment.mStepsAdapter.setStepsCursor(null);
+            default:
+                break;
+        }
     }
 
     @Override
@@ -103,4 +141,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
     }
 
+
+    @Override
+    public void onRecipeSelected(int position, String[] recipeInfo) {
+        mRecipeInfo = recipeInfo;
+        recipeName = recipeInfo[0];
+        if(mTwoPane){
+            getLoaderManager().restartLoader(STEPS_LOADER_ID,null,this);
+        }else {
+            Intent startDetailsActivityIntent = new Intent(this, RecipeDetailsActivity.class);
+            startDetailsActivityIntent.putExtra(MainActivity.INTENT_TAG, recipeInfo);
+            startActivity(startDetailsActivityIntent);
+        }
+    }
 }
