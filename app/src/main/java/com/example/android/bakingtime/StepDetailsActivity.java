@@ -6,22 +6,18 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.net.Uri;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.android.bakingtime.data.RecipesDataContract;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -58,6 +54,11 @@ public class StepDetailsActivity extends AppCompatActivity implements LoaderMana
     private PlaybackStateCompat.Builder mStateBuilder;
     private int firstId;
     private int lastId;
+    private String MEDIAPLAYER_STATE_POSITION = "media_player_position";
+    private String MEDIAPLAYER_STATE_READY = "media_player_ready";
+    private Long playerPositionSavedState;
+    private Boolean playerReadySavedState;
+    private Uri videoUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,14 +76,53 @@ public class StepDetailsActivity extends AppCompatActivity implements LoaderMana
         getLoaderManager().initLoader(STEP_INFO_LOADER_ID,null,this);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    private void releasePlayer() {
         if(mExoPlayer != null) {
             mMediaSession.setActive(false);
             mExoPlayer.stop();
             mExoPlayer.release();
             mExoPlayer = null;
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        playerPositionSavedState = mExoPlayer.getCurrentPosition();
+        playerReadySavedState = mExoPlayer.getPlayWhenReady();
+        if (Util.SDK_INT <= 23) {
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (Util.SDK_INT > 23) {
+            releasePlayer();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if ((Util.SDK_INT <= 23 || mExoPlayer == null)) {
+            initializeMediaSession();
+            initializePlayer();
+        }
+        if(mExoPlayer != null && videoUri != null && playerReadySavedState != null && playerPositionSavedState != null){
+            setPlayer(videoUri);
+            mExoPlayer.seekTo(playerPositionSavedState);
+            mExoPlayer.setPlayWhenReady(playerReadySavedState);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (Util.SDK_INT > 23) {
+            initializeMediaSession();
+            initializePlayer();
         }
     }
 
@@ -134,9 +174,10 @@ public class StepDetailsActivity extends AppCompatActivity implements LoaderMana
             }else{
                 mNoVideoMessage.setVisibility(View.GONE);
                 mPlayerView.setVisibility(View.VISIBLE);
-                Uri videoUri = Uri.parse(videoUrl);
-                initializeMediaSession();
-                initializePlayer(videoUri);
+                videoUri = Uri.parse(videoUrl);
+                setPlayer(videoUri);
+//                initializeMediaSession();
+//                initializePlayer(videoUri);
             }
         }else{
             Log.d(StepDetailsActivity.class.getSimpleName(),"cursor is empty");
@@ -146,14 +187,18 @@ public class StepDetailsActivity extends AppCompatActivity implements LoaderMana
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {}
 
-    private void initializePlayer(Uri uri){
-        Log.d(StepDetailsActivity.class.getSimpleName(),uri.toString());
+    private void initializePlayer(){
         if(mExoPlayer == null){
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(this,trackSelector,loadControl);
             mPlayerView.setPlayer(mExoPlayer);
             mExoPlayer.addListener(this);
+        }
+    }
+
+    private void setPlayer(Uri uri){
+        if(mExoPlayer != null && uri != null){
             String userAgent = Util.getUserAgent(this,"Baking Time");
             MediaSource mediaSource = new ExtractorMediaSource(uri, new DefaultDataSourceFactory(this,userAgent),new DefaultExtractorsFactory(),null,null);
             mExoPlayer.prepare(mediaSource);
@@ -220,6 +265,22 @@ public class StepDetailsActivity extends AppCompatActivity implements LoaderMana
         @Override
         public void onReceive(Context context, Intent intent) {
             MediaButtonReceiver.handleIntent(mMediaSession,intent);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(MEDIAPLAYER_STATE_POSITION,playerPositionSavedState);
+        outState.putBoolean(MEDIAPLAYER_STATE_READY,playerReadySavedState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if(savedInstanceState != null){
+            playerPositionSavedState = savedInstanceState.getLong(MEDIAPLAYER_STATE_POSITION);
+            playerReadySavedState = savedInstanceState.getBoolean(MEDIAPLAYER_STATE_READY);
         }
     }
 
