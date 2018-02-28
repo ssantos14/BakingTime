@@ -32,17 +32,34 @@ import com.example.android.bakingtime.StepsAdapter;
 public class RecipeDetailsFragment extends Fragment implements StepsAdapter.ListItemClickListener{
     public static StepsAdapter mStepsAdapter;
     private GridLayoutManager layoutManager;
-    public static final String ID_TAG = "_id";
-    public static final String START_ID_TAG = "start";
-    public static final String END_ID_TAG = "end";
     public static TextView mRecipeNameTextView;
     public static TextView mRecipeServingsTextView;
     public static TextView mRecipeIngredientsTextView;
     public static NestedScrollView mDetailsScrollView;
+    public static TextView mRecipeIngredientsLabel;
     public RecyclerView recyclerView;
-    private static int firstId;
-    private static int lastId;
     public RecipeDetailsFragment(){}
+
+    OnStepSelectedListener mCallback;
+
+    public interface OnStepSelectedListener {
+        void onStepSelected(int position,int step, int startId, int endId);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mCallback = (OnStepSelectedListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnStepSelectedListener");
+        }
+    }
+
+    @Override
+    public void onListItemClick(int clickedItemIndex,int stepId, int firstId, int lastId) {
+        mCallback.onStepSelected(clickedItemIndex,stepId, firstId, lastId);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -51,6 +68,7 @@ public class RecipeDetailsFragment extends Fragment implements StepsAdapter.List
         mRecipeServingsTextView = rootView.findViewById(R.id.recipe_details_servings);
         mRecipeIngredientsTextView = rootView.findViewById(R.id.recipe_details_ingredients);
         mDetailsScrollView = rootView.findViewById(R.id.details_scroll_view);
+        mRecipeIngredientsLabel = rootView.findViewById(R.id.recipe_details_ingredients_label);
         recyclerView = rootView.findViewById(R.id.recipe_steps_recycler_view);
         layoutManager = new GridLayoutManager(getActivity(), 1);
         recyclerView.setLayoutManager(layoutManager);
@@ -60,18 +78,7 @@ public class RecipeDetailsFragment extends Fragment implements StepsAdapter.List
         return rootView;
     }
 
-    @Override
-    public void onListItemClick(int adapterPosition, int stepId) {
-        Intent startStepDetailsActivityIntent = new Intent(getActivity(),StepDetailsActivity.class);
-        startStepDetailsActivityIntent.putExtra(ID_TAG,stepId);
-        startStepDetailsActivityIntent.putExtra(START_ID_TAG,firstId);
-        startStepDetailsActivityIntent.putExtra(END_ID_TAG,lastId);
-        startActivity(startStepDetailsActivityIntent);
-    }
-
-    public static void setRecipeDetailsContents(String[] recipeInfo, Cursor cursor, int FirstId, int LastId){
-        firstId = FirstId;
-        lastId = LastId;
+    public static void setRecipeDetailsContents(String[] recipeInfo, Cursor cursor){
         mRecipeNameTextView.setText(recipeInfo[0]);
         mRecipeServingsTextView.setText(recipeInfo[1]);
         mRecipeIngredientsTextView.setText(recipeInfo[2]);

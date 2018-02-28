@@ -31,7 +31,6 @@ import com.example.android.bakingtime.data.RecipesDataContract;
 public class RecipeListFragment extends Fragment implements RecipesAdapter.ListItemClickListener{
     public static RecipesAdapter mRecipesAdapter;
     public static GridLayoutManager layoutManager;
-    public static final String RESTART_INTENT_TAG = "info_for_clicked_recipe";
     public RecipeListFragment(){}
 
     OnRecipeSelectedListener mCallback;
@@ -46,7 +45,7 @@ public class RecipeListFragment extends Fragment implements RecipesAdapter.ListI
         try {
             mCallback = (OnRecipeSelectedListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnHeadlineSelectedListener");
+            throw new ClassCastException(activity.toString() + " must implement OnRecipeSelectedListener");
         }
     }
 

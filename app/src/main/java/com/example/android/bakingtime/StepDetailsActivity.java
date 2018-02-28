@@ -1,5 +1,6 @@
 package com.example.android.bakingtime;
 
+import android.app.FragmentManager;
 import android.app.LoaderManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -20,6 +21,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.android.bakingtime.data.RecipesDataContract;
+import com.example.android.bakingtime.ui.RecipeDetailsFragment;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -41,7 +43,11 @@ import com.google.android.exoplayer2.util.Util;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class StepDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, ExoPlayer.EventListener{
+import static com.example.android.bakingtime.MainActivity.STEPS_LOADER_ID;
+import static com.example.android.bakingtime.MainActivity.STEPS_PROJECTION;
+
+public class StepDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
+        ExoPlayer.EventListener,RecipeDetailsFragment.OnStepSelectedListener{
     @BindView(R.id.description) TextView mDescriptionTextView;
     @BindView(R.id.placeholder) TextView mNoVideoMessage;
     @BindView(R.id.player_view) SimpleExoPlayerView mPlayerView;
@@ -59,6 +65,8 @@ public class StepDetailsActivity extends AppCompatActivity implements LoaderMana
     private Long playerPositionSavedState;
     private Boolean playerReadySavedState;
     private Uri videoUri;
+    private boolean mTwoPane;
+    private String recipeName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +80,19 @@ public class StepDetailsActivity extends AppCompatActivity implements LoaderMana
             lastId = intentThatStartedThisActivity.getIntExtra(RecipeDetailsActivity.END_ID_TAG,0);
             if(stepId == firstId){mPreviousButton.setVisibility(View.GONE);}
             if(stepId == lastId){mNextButton.setVisibility(View.GONE);}
+            recipeName = intentThatStartedThisActivity.getStringExtra("recipe_name");
+        }
+        if(findViewById(R.id.divider) != null){
+            mTwoPane = true; //Two pane case
+            RecipeDetailsFragment.mRecipeNameTextView.setVisibility(View.GONE);
+            RecipeDetailsFragment.mRecipeServingsTextView.setVisibility(View.GONE);
+            RecipeDetailsFragment.mRecipeIngredientsTextView.setVisibility(View.GONE);
+            RecipeDetailsFragment.mRecipeIngredientsLabel.setVisibility(View.GONE);
+            mPreviousButton.setVisibility(View.GONE);
+            mNextButton.setVisibility(View.GONE);
+            getLoaderManager().initLoader(STEPS_LOADER_ID,null,this);
+        }else{
+            mTwoPane = false; //One pane case
         }
         getLoaderManager().initLoader(STEP_INFO_LOADER_ID,null,this);
     }
@@ -150,11 +171,16 @@ public class StepDetailsActivity extends AppCompatActivity implements LoaderMana
     public Loader<Cursor> onCreateLoader(int loaderId, Bundle bundle) {
         switch (loaderId){
             case STEP_INFO_LOADER_ID:
-                Uri stepsUri = RecipesDataContract.StepEntry.STEPS_CONTENT_URI;
+                Uri stepUri = RecipesDataContract.StepEntry.STEPS_CONTENT_URI;
                 String selection = "_id=?";
                 String id = String.valueOf(stepId);
                 String[] selectionArgs = {id};
-                return new CursorLoader(this,stepsUri,RecipeDetailsActivity.STEPS_PROJECTION,selection,selectionArgs,null);
+                return new CursorLoader(this,stepUri,RecipeDetailsActivity.STEPS_PROJECTION,selection,selectionArgs,null);
+            case STEPS_LOADER_ID:
+                Uri stepsUri = RecipesDataContract.StepEntry.STEPS_CONTENT_URI;
+                String select = "recipe=?";
+                String[] selectArgs = {recipeName};
+                return new CursorLoader(this,stepsUri,STEPS_PROJECTION,select,selectArgs,null);
             default:
                 throw new RuntimeException("Loader not implemented: " + loaderId);
         }
@@ -162,25 +188,34 @@ public class StepDetailsActivity extends AppCompatActivity implements LoaderMana
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if(cursor != null) {
-            DatabaseUtils.dumpCursor(cursor);
-            cursor.moveToFirst();
-            String description = cursor.getString(3);
-            String videoUrl = cursor.getString(4);
-            mDescriptionTextView.setText(description);
-            if(videoUrl == null || videoUrl.isEmpty() || videoUrl.equalsIgnoreCase("null")) {
-                mPlayerView.setVisibility(View.GONE);
-                mNoVideoMessage.setVisibility(View.VISIBLE);
-            }else{
-                mNoVideoMessage.setVisibility(View.GONE);
-                mPlayerView.setVisibility(View.VISIBLE);
-                videoUri = Uri.parse(videoUrl);
-                setPlayer(videoUri);
-//                initializeMediaSession();
-//                initializePlayer(videoUri);
-            }
-        }else{
-            Log.d(StepDetailsActivity.class.getSimpleName(),"cursor is empty");
+        int loaderId = loader.getId();
+        switch (loaderId){
+            case STEP_INFO_LOADER_ID:
+                if(cursor != null) {
+                    cursor.moveToFirst();
+                    String description = cursor.getString(3);
+                    String videoUrl = cursor.getString(4);
+                    mDescriptionTextView.setText(description);
+                    if(videoUrl == null || videoUrl.isEmpty() || videoUrl.equalsIgnoreCase("null")) {
+                        mPlayerView.setVisibility(View.GONE);
+                        mNoVideoMessage.setVisibility(View.VISIBLE);
+                    }else{
+                        mNoVideoMessage.setVisibility(View.GONE);
+                        mPlayerView.setVisibility(View.VISIBLE);
+                        videoUri = Uri.parse(videoUrl);
+                        setPlayer(videoUri);
+                    }
+                }else{
+                    Log.d(StepDetailsActivity.class.getSimpleName(),"cursor is empty");
+                }
+                break;
+            case STEPS_LOADER_ID:
+                if(cursor != null && cursor.getCount() != 0) {
+                    RecipeDetailsFragment.setRecipeDetailsContents(new String[]{"","",""},cursor);
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -282,6 +317,14 @@ public class StepDetailsActivity extends AppCompatActivity implements LoaderMana
             playerPositionSavedState = savedInstanceState.getLong(MEDIAPLAYER_STATE_POSITION);
             playerReadySavedState = savedInstanceState.getBoolean(MEDIAPLAYER_STATE_READY);
         }
+    }
+
+    @Override
+    public void onStepSelected(int position, int step, int startId, int endId) {
+        stepId = step;
+        firstId = startId;
+        lastId = endId;
+        getLoaderManager().restartLoader(STEP_INFO_LOADER_ID,null,this);
     }
 
 }

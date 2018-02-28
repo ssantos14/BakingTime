@@ -25,7 +25,7 @@ import com.example.android.bakingtime.ui.RecipeDetailsFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class RecipeDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+public class RecipeDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,RecipeDetailsFragment.OnStepSelectedListener{
     private static final int STEPS_LOADER_ID = 776;
     public static final String[] STEPS_PROJECTION = {
             RecipesDataContract.StepEntry._ID,
@@ -39,8 +39,6 @@ public class RecipeDetailsActivity extends AppCompatActivity implements LoaderMa
     public static final String ID_TAG = "_id";
     public static final String START_ID_TAG = "start";
     public static final String END_ID_TAG = "end";
-    public static int firstId;
-    public static int lastId;
     private String[] recipeInfo;
 
     @Override
@@ -76,11 +74,7 @@ public class RecipeDetailsActivity extends AppCompatActivity implements LoaderMa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if(cursor != null && cursor.getCount() != 0) {
-            cursor.moveToFirst();
-            firstId = cursor.getInt(0);
-            cursor.moveToLast();
-            lastId = cursor.getInt(0);
-            RecipeDetailsFragment.setRecipeDetailsContents(recipeInfo,cursor,firstId,lastId);
+            RecipeDetailsFragment.setRecipeDetailsContents(recipeInfo,cursor);
         }else{
             Log.d(RecipeDetailsActivity.class.getSimpleName(),"cursor is empty");
         }
@@ -89,4 +83,12 @@ public class RecipeDetailsActivity extends AppCompatActivity implements LoaderMa
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {RecipeDetailsFragment.mStepsAdapter.setStepsCursor(null);}
 
+    @Override
+    public void onStepSelected(int position, int step, int firstId, int lastId) {
+        Intent startStepDetailsActivityIntent = new Intent(this,StepDetailsActivity.class);
+        startStepDetailsActivityIntent.putExtra(ID_TAG,step);
+        startStepDetailsActivityIntent.putExtra(START_ID_TAG,firstId);
+        startStepDetailsActivityIntent.putExtra(END_ID_TAG,lastId);
+        startActivity(startStepDetailsActivityIntent);
+    }
 }
