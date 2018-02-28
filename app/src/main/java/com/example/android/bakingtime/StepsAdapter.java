@@ -2,6 +2,7 @@ package com.example.android.bakingtime;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,9 +19,15 @@ import butterknife.ButterKnife;
 public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHolder> {
     private Cursor mStepsCursor;
     private final ListItemClickListener mClickListener;
+    private static int firstId;
+    private static int lastId;
 
     public void setStepsCursor(Cursor stepsCursor){
         mStepsCursor = stepsCursor;
+        stepsCursor.moveToFirst();
+        firstId = stepsCursor.getInt(0);
+        stepsCursor.moveToLast();
+        lastId = stepsCursor.getInt(0);
         notifyDataSetChanged();
     }
 
@@ -39,7 +46,7 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHold
         public void onClick(View view) {
             int clickedPosition = getAdapterPosition();
             int stepId = (int) mShortDescriptionTextView.getTag();
-            mClickListener.onListItemClick(clickedPosition,stepId);
+            mClickListener.onListItemClick(clickedPosition,stepId,firstId,lastId);
         }
     }
 
@@ -69,6 +76,6 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHold
     }
 
     public interface ListItemClickListener{
-        void onListItemClick(int clickedItemIndex, int StepId);
+        void onListItemClick(int clickedItemIndex, int StepId, int FirstId, int LastId);
     }
 }

@@ -17,9 +17,13 @@ import com.example.android.bakingtime.sync.SyncRecipesDataIntentService;
 import com.example.android.bakingtime.ui.RecipeDetailsFragment;
 import com.example.android.bakingtime.ui.RecipeListFragment;
 
+import static com.example.android.bakingtime.RecipeDetailsActivity.END_ID_TAG;
+import static com.example.android.bakingtime.RecipeDetailsActivity.ID_TAG;
+import static com.example.android.bakingtime.RecipeDetailsActivity.START_ID_TAG;
 import static com.example.android.bakingtime.ui.RecipeListFragment.layoutManager;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,RecipeListFragment.OnRecipeSelectedListener{
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
+        RecipeListFragment.OnRecipeSelectedListener,RecipeDetailsFragment.OnStepSelectedListener{
     private static final int RECIPES_LOADER_ID = 29;
     public static final String[] RECIPES_PROJECTION = {
             RecipesDataContract.RecipeEntry.COLUMN_RECIPE_NAME,
@@ -40,8 +44,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             RecipesDataContract.StepEntry.COLUMN_THUMBNAIL_URL
     };
     private static String recipeName;
-    private static int firstId;
-    private static int lastId;
     private static String[] mRecipeInfo;
 
     @Override
@@ -99,13 +101,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 }
                 break;
             case STEPS_LOADER_ID:
-                Log.d(MainActivity.class.getSimpleName(),"STEPS LOADER FINISHED");
                 if(cursor != null && cursor.getCount() != 0) {
-                    cursor.moveToFirst();
-                    firstId = cursor.getInt(0);
-                    cursor.moveToLast();
-                    lastId = cursor.getInt(0);
-                    RecipeDetailsFragment.setRecipeDetailsContents(mRecipeInfo,cursor,firstId,lastId);
+                    RecipeDetailsFragment.setRecipeDetailsContents(mRecipeInfo,cursor);
                 }
                 break;
             default:
@@ -153,5 +150,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             startDetailsActivityIntent.putExtra(MainActivity.INTENT_TAG, recipeInfo);
             startActivity(startDetailsActivityIntent);
         }
+    }
+
+    @Override
+    public void onStepSelected(int position, int step, int firstId, int lastId) {
+        Intent startStepDetailsActivityIntent = new Intent(this,StepDetailsActivity.class);
+        startStepDetailsActivityIntent.putExtra(ID_TAG,step);
+        startStepDetailsActivityIntent.putExtra(START_ID_TAG,firstId);
+        startStepDetailsActivityIntent.putExtra(END_ID_TAG,lastId);
+        startStepDetailsActivityIntent.putExtra("recipe_name", recipeName);
+        startActivity(startStepDetailsActivityIntent);
     }
 }
