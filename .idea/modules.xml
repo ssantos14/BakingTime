@@ -3,9 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BakingTime.iml" filepath="$PROJECT_DIR$/BakingTime.iml" />
+      <module fileurl="file://C:\Users\Sylvana\Documents\AndroidDevelopmentExercises\BakingTime\BakingTime.iml" filepath="C:\Users\Sylvana\Documents\AndroidDevelopmentExercises\BakingTime\BakingTime.iml" />
       <module fileurl="file://C:\Users\Sylvana\Downloads\BakingTime-master\BakingTime\BakingTime.iml" filepath="C:\Users\Sylvana\Downloads\BakingTime-master\BakingTime\BakingTime.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://C:\Users\Sylvana\Downloads\BakingTime-master\BakingTime\app\app.iml" filepath="C:\Users\Sylvana\Downloads\BakingTime-master\BakingTime\app\app.iml" />
+      <module fileurl="file://C:\Users\Sylvana\Documents\AndroidDevelopmentExercises\BakingTime\app\app.iml" filepath="C:\Users\Sylvana\Documents\AndroidDevelopmentExercises\BakingTime\app\app.iml" />
     </modules>
   </component>
 </project>

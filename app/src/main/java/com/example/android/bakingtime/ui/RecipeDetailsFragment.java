@@ -31,7 +31,7 @@ import com.example.android.bakingtime.StepsAdapter;
 
 public class RecipeDetailsFragment extends Fragment implements StepsAdapter.ListItemClickListener{
     public static StepsAdapter mStepsAdapter;
-    private GridLayoutManager layoutManager;
+    public static GridLayoutManager layoutManager;
     public static TextView mRecipeNameTextView;
     public static TextView mRecipeServingsTextView;
     public static TextView mRecipeIngredientsTextView;

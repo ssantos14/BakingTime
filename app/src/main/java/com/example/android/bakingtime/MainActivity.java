@@ -33,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public static final String INTENT_TAG = "recipe_info";
     private static final String RECYCLER_VIEW_POSITION = "rv_position";
     private Parcelable recipesSavedState;
+    private static final String DETAILS_STATE = "details_state";
+    private Parcelable detailsSavedState;
     private static boolean mTwoPane;
     public static final int STEPS_LOADER_ID = 776;
     public static final String[] STEPS_PROJECTION = {
@@ -54,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         startService(intentToSyncImmediately);
         if(findViewById(R.id.divider) != null){
             mTwoPane = true; //Two pane case
-            Log.d(MainActivity.class.getSimpleName(),"WE ARE IN THE TWO PANE CASE IN ONCREATE");
             if(savedInstanceState == null) {
                 RecipeDetailsFragment detailsFragment = new RecipeDetailsFragment();
                 FragmentManager fragmentManager = getFragmentManager();
@@ -88,21 +89,23 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         int loaderId = loader.getId();
         switch (loaderId){
             case RECIPES_LOADER_ID:
-                Log.d(MainActivity.class.getSimpleName(),"RECIPE LOADER FINISHED");
-                RecipeListFragment.mRecipesAdapter.setRecipeDataCursor(cursor);
-                layoutManager.onRestoreInstanceState(recipesSavedState);
-                if(MainActivity.mTwoPane){
-                    cursor.moveToFirst();
-                    recipeName = cursor.getString(0);
-                    String servings = cursor.getString(1);
-                    String ingredients = cursor.getString(2);
-                    mRecipeInfo = new String[]{recipeName,servings,ingredients};
-                    getLoaderManager().initLoader(STEPS_LOADER_ID,null,this);
+                if(cursor != null && cursor.getCount() != 0){
+                    RecipeListFragment.mRecipesAdapter.setRecipeDataCursor(cursor);
+                    layoutManager.onRestoreInstanceState(recipesSavedState);
+                    if(MainActivity.mTwoPane){
+                        cursor.moveToFirst();
+                        recipeName = cursor.getString(0);
+                        String servings = cursor.getString(1);
+                        String ingredients = cursor.getString(2);
+                        mRecipeInfo = new String[]{recipeName,servings,ingredients};
+                        getLoaderManager().initLoader(STEPS_LOADER_ID,null,this);
+                    }
                 }
                 break;
             case STEPS_LOADER_ID:
                 if(cursor != null && cursor.getCount() != 0) {
                     RecipeDetailsFragment.setRecipeDetailsContents(mRecipeInfo,cursor);
+                    RecipeDetailsFragment.layoutManager.onRestoreInstanceState(detailsSavedState);
                 }
                 break;
             default:
@@ -128,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(RECYCLER_VIEW_POSITION, layoutManager.onSaveInstanceState());
+        outState.putParcelable(DETAILS_STATE, RecipeDetailsFragment.layoutManager.onSaveInstanceState());
     }
 
     @Override
@@ -135,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onRestoreInstanceState(savedInstanceState);
         if(savedInstanceState != null){
             recipesSavedState = savedInstanceState.getParcelable(RECYCLER_VIEW_POSITION);
+            detailsSavedState = savedInstanceState.getParcelable(DETAILS_STATE);
         }
     }
 
