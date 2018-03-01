@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class RecipesDbHelper extends SQLiteOpenHelper{
     private static final String DATABASE_NAME = "recipes.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
     public RecipesDbHelper(Context context){
         super(context,DATABASE_NAME,null,DATABASE_VERSION);
     }
@@ -20,7 +20,8 @@ public class RecipesDbHelper extends SQLiteOpenHelper{
         final String SQL_CREATE_RECIPES_TABLE = "CREATE TABLE " + RecipesDataContract.RecipeEntry.RECIPES_TABLE_NAME + " (" +
                 RecipesDataContract.RecipeEntry.COLUMN_RECIPE_NAME + " TEXT NOT NULL, " +
                 RecipesDataContract.RecipeEntry.COLUMN_RECIPE_SERVINGS + " TEXT NOT NULL, " +
-                RecipesDataContract.RecipeEntry.COLUMN_RECIPE_INGREDIENTS + " TEXT NOT NULL);";
+                RecipesDataContract.RecipeEntry.COLUMN_RECIPE_INGREDIENTS + " TEXT NOT NULL, " +
+                RecipesDataContract.RecipeEntry.COLUMN_RECIPE_IMAGE + " TEXT NOT NULL);";
         final String SQL_CREATE_STEPS_TABLE = "CREATE TABLE " + RecipesDataContract.StepEntry.STEPS_TABLE_NAME + " (" +
                 RecipesDataContract.StepEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 RecipesDataContract.StepEntry.COLUMN_RECIPE_NAME + " TEXT NOT NULL, " +

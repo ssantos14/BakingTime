@@ -38,10 +38,8 @@
             android:visibility="gone"
             android:background="@drawable/rectangle_accent_color">
         </com.google.android.exoplayer2.ui.SimpleExoPlayerView>
-        <TextView
+        <ImageView
             android:id="@+id/placeholder"
-            android:text="@string/no_video_message"
-            android:textAlignment="center"
             android:gravity="center"
             android:background="@drawable/rectangle_accent_color"
             android:layout_width="0dp"

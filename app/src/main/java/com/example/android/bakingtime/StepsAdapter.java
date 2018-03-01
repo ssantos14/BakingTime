@@ -23,12 +23,14 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHold
     private static int lastId;
 
     public void setStepsCursor(Cursor stepsCursor){
-        mStepsCursor = stepsCursor;
-        stepsCursor.moveToFirst();
-        firstId = stepsCursor.getInt(0);
-        stepsCursor.moveToLast();
-        lastId = stepsCursor.getInt(0);
-        notifyDataSetChanged();
+        if(stepsCursor != null && stepsCursor.getCount() > 0){
+            mStepsCursor = stepsCursor;
+            stepsCursor.moveToFirst();
+            firstId = stepsCursor.getInt(0);
+            stepsCursor.moveToLast();
+            lastId = stepsCursor.getInt(0);
+            notifyDataSetChanged();
+        }
     }
 
     public StepsAdapter(ListItemClickListener listener) {

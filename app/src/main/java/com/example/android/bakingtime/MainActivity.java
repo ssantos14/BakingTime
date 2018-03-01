@@ -11,6 +11,7 @@ import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.example.android.bakingtime.data.RecipesDataContract;
 import com.example.android.bakingtime.sync.SyncRecipesDataIntentService;
@@ -28,7 +29,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public static final String[] RECIPES_PROJECTION = {
             RecipesDataContract.RecipeEntry.COLUMN_RECIPE_NAME,
             RecipesDataContract.RecipeEntry.COLUMN_RECIPE_SERVINGS,
-            RecipesDataContract.RecipeEntry.COLUMN_RECIPE_INGREDIENTS
+            RecipesDataContract.RecipeEntry.COLUMN_RECIPE_INGREDIENTS,
+            RecipesDataContract.RecipeEntry.COLUMN_RECIPE_IMAGE
     };
     public static final String INTENT_TAG = "recipe_info";
     private static final String RECYCLER_VIEW_POSITION = "rv_position";
@@ -166,4 +168,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         startStepDetailsActivityIntent.putExtra("recipe_name", recipeName);
         startActivity(startStepDetailsActivityIntent);
     }
+
+    public void makeWidget(View view){
+        SetWidgetService.startActionSetWidget(this,recipeName,mRecipeInfo[2]);
+    }
+
 }

@@ -16,6 +16,8 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -91,4 +93,9 @@ public class RecipeDetailsActivity extends AppCompatActivity implements LoaderMa
         startStepDetailsActivityIntent.putExtra(END_ID_TAG,lastId);
         startActivity(startStepDetailsActivityIntent);
     }
+
+    public void makeWidget(View view){
+        SetWidgetService.startActionSetWidget(this,recipeName,recipeInfo[2]);
+    }
+
 }

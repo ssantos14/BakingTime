@@ -15,10 +15,14 @@ import com.example.android.bakingtime.data.RecipesDataContract;
  */
 
 public class SetWidgetService extends IntentService {
-    public static final String ACTION_SET_WIDGET = "set_widget";
+    private static final String ACTION_SET_WIDGET = "set_widget";
+    private static String RecipeName;
+    private static String RecipeIngredients;
     public SetWidgetService(){super("SetWidgetService");}
 
-    public static void startActionSetWidget(Context context){
+    public static void startActionSetWidget(Context context, String recipeName,String recipeIngredients){
+        RecipeName = recipeName;
+        RecipeIngredients = recipeIngredients;
         Intent intent = new Intent(context,SetWidgetService.class);
         intent.setAction(ACTION_SET_WIDGET);
         context.startService(intent);
@@ -35,20 +39,8 @@ public class SetWidgetService extends IntentService {
     }
 
     private void handleActionSetWidget(){
-        String recipeName = null;
-        String recipeIngredients = null;
-        Uri recipeUri = RecipesDataContract.RecipeEntry.RECIPES_CONTENT_URI;
-        Cursor cursor = getContentResolver().query(recipeUri,null,null,null,null);
-        if(cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            int recipeNameIndex = cursor.getColumnIndex(RecipesDataContract.RecipeEntry.COLUMN_RECIPE_NAME);
-            int recipeIngredientsIndex = cursor.getColumnIndex(RecipesDataContract.RecipeEntry.COLUMN_RECIPE_INGREDIENTS);
-            recipeName = cursor.getString(recipeNameIndex);
-            recipeIngredients = cursor.getString(recipeIngredientsIndex);
-            cursor.close();
-        }
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this,BakingTimeWidgetProvider.class));
-        BakingTimeWidgetProvider.updateAppWidget(this,appWidgetManager,appWidgetIds,recipeName,recipeIngredients);
+        BakingTimeWidgetProvider.updateAppWidget(this,appWidgetManager,appWidgetIds,RecipeName,RecipeIngredients);
     }
 }

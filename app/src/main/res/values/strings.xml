@@ -5,4 +5,6 @@
     <string name="no_video_message">No video available for this step</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="widget_make">Make Widget</string>
+    <string name="no_video">No video available for this step</string>
 </resources>

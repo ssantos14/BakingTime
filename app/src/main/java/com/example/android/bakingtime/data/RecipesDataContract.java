@@ -21,6 +21,7 @@ public class RecipesDataContract {
         public static final String COLUMN_RECIPE_NAME = "name";
         public static final String COLUMN_RECIPE_SERVINGS = "servings";
         public static final String COLUMN_RECIPE_INGREDIENTS = "ingredients";
+        public static final String COLUMN_RECIPE_IMAGE = "image";
     }
     public static final class StepEntry implements BaseColumns{
         public static final Uri STEPS_CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_STEPS).build();

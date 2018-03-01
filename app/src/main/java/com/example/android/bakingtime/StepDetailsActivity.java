@@ -15,10 +15,14 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.bakingtime.data.RecipesDataContract;
 import com.example.android.bakingtime.ui.RecipeDetailsFragment;
@@ -39,6 +43,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,11 +54,12 @@ import static com.example.android.bakingtime.MainActivity.STEPS_PROJECTION;
 public class StepDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
         ExoPlayer.EventListener,RecipeDetailsFragment.OnStepSelectedListener{
     @BindView(R.id.description) TextView mDescriptionTextView;
-    @BindView(R.id.placeholder) TextView mNoVideoMessage;
+    @BindView(R.id.placeholder) ImageView mNoVideoMessage;
     @BindView(R.id.player_view) SimpleExoPlayerView mPlayerView;
     private SimpleExoPlayer mExoPlayer;
     @BindView(R.id.move_to_previous_button) ImageButton mPreviousButton;
     @BindView(R.id.move_to_next_button) ImageButton mNextButton;
+    @BindView(R.id.widget_button) Button mWidgetButton;
     private int stepId;
     private static final int STEP_INFO_LOADER_ID = 989;
     private static MediaSessionCompat mMediaSession;
@@ -90,6 +96,7 @@ public class StepDetailsActivity extends AppCompatActivity implements LoaderMana
             RecipeDetailsFragment.mRecipeIngredientsLabel.setVisibility(View.GONE);
             mPreviousButton.setVisibility(View.GONE);
             mNextButton.setVisibility(View.GONE);
+            mWidgetButton.setVisibility(View.GONE);
             getLoaderManager().initLoader(STEPS_LOADER_ID,null,this);
         }else{
             mTwoPane = false; //One pane case
@@ -195,10 +202,15 @@ public class StepDetailsActivity extends AppCompatActivity implements LoaderMana
                     cursor.moveToFirst();
                     String description = cursor.getString(3);
                     String videoUrl = cursor.getString(4);
+                    String thumbnailUrl = cursor.getString(5);
                     mDescriptionTextView.setText(description);
-                    if(videoUrl == null || videoUrl.isEmpty() || videoUrl.equalsIgnoreCase("null")) {
+                    if(!TextUtils.isEmpty(thumbnailUrl)){
+                        Picasso.with(mNoVideoMessage.getContext()).load(thumbnailUrl).into(mNoVideoMessage);
+                    }
+                    if(TextUtils.isEmpty(videoUrl)) {
                         mPlayerView.setVisibility(View.GONE);
                         mNoVideoMessage.setVisibility(View.VISIBLE);
+                        Toast.makeText(this,getString(R.string.no_video),Toast.LENGTH_LONG).show();
                     }else{
                         mNoVideoMessage.setVisibility(View.GONE);
                         mPlayerView.setVisibility(View.VISIBLE);

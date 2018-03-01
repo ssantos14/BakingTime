@@ -12,8 +12,12 @@ import android.widget.RemoteViews;
  * Implementation of App Widget functionality.
  */
 public class BakingTimeWidgetProvider extends AppWidgetProvider {
+    private static String RecipeName;
+    private static String RecipeIngredients;
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int[] appWidgetId, String recipeName, String recipeIngredients) {
+        RecipeName = recipeName;
+        RecipeIngredients = recipeIngredients;
         Intent intent = new Intent(context,MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context,0,intent,0);
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.baking_time_widget);
@@ -25,7 +29,7 @@ public class BakingTimeWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        SetWidgetService.startActionSetWidget(context);
+        SetWidgetService.startActionSetWidget(context,RecipeName,RecipeIngredients);
     }
 
     @Override

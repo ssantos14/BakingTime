@@ -25,6 +25,7 @@ public class OpenRecipesJsonUtils {
         String recipeName;
         String recipeIngredients;
         String recipeServings;
+        String recipeImage;
 
         JSONArray recipesJSONArray = new JSONArray(recipesJSON);
         recipesData = new ContentValues[recipesJSONArray.length()];
@@ -33,11 +34,13 @@ public class OpenRecipesJsonUtils {
             recipeName = recipe.getString("name");
             recipeServings = "Servings: " +recipe.getString("servings");
             recipeIngredients = getIngredients(recipe.getJSONArray("ingredients"));
+            recipeImage = recipe.getString("image");
 
             ContentValues recipesContentValues = new ContentValues();
             recipesContentValues.put(RecipesDataContract.RecipeEntry.COLUMN_RECIPE_NAME,recipeName);
             recipesContentValues.put(RecipesDataContract.RecipeEntry.COLUMN_RECIPE_SERVINGS,recipeServings);
             recipesContentValues.put(RecipesDataContract.RecipeEntry.COLUMN_RECIPE_INGREDIENTS,recipeIngredients);
+            recipesContentValues.put(RecipesDataContract.RecipeEntry.COLUMN_RECIPE_IMAGE,recipeImage);
             recipesData[i] = recipesContentValues;
         }
         return recipesData;

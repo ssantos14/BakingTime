@@ -15,6 +15,7 @@
         android:elevation="4dp">
 
         <ImageView
+            android:id="@+id/recipe_image_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_cupcake_2"
