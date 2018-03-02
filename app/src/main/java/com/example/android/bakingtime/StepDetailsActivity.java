@@ -59,7 +59,6 @@ public class StepDetailsActivity extends AppCompatActivity implements LoaderMana
     private SimpleExoPlayer mExoPlayer;
     @BindView(R.id.move_to_previous_button) ImageButton mPreviousButton;
     @BindView(R.id.move_to_next_button) ImageButton mNextButton;
-    @BindView(R.id.widget_button) Button mWidgetButton;
     private int stepId;
     private static final int STEP_INFO_LOADER_ID = 989;
     private static MediaSessionCompat mMediaSession;
@@ -96,7 +95,7 @@ public class StepDetailsActivity extends AppCompatActivity implements LoaderMana
             RecipeDetailsFragment.mRecipeIngredientsLabel.setVisibility(View.GONE);
             mPreviousButton.setVisibility(View.GONE);
             mNextButton.setVisibility(View.GONE);
-            mWidgetButton.setVisibility(View.GONE);
+            RecipeDetailsFragment.mWidgetButton.setVisibility(View.GONE);
             getLoaderManager().initLoader(STEPS_LOADER_ID,null,this);
         }else{
             mTwoPane = false; //One pane case

@@ -48,12 +48,15 @@
         <provider
             android:name=".data.RecipesContentProvider"
             android:authorities="com.example.android.bakingtime"
-            android:exported="false" />
+            android:exported="true" />
 
         <service
             android:name=".sync.SyncRecipesDataIntentService"
             android:exported="false" />
         <service android:name=".SetWidgetService"/>
+        <service
+            android:name=".ListWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
 
 </manifest>
