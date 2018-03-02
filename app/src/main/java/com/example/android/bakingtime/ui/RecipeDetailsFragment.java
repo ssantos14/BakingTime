@@ -16,6 +16,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.android.bakingtime.MainActivity;
@@ -37,6 +38,7 @@ public class RecipeDetailsFragment extends Fragment implements StepsAdapter.List
     public static TextView mRecipeIngredientsTextView;
     public static NestedScrollView mDetailsScrollView;
     public static TextView mRecipeIngredientsLabel;
+    public static Button mWidgetButton;
     public RecyclerView recyclerView;
     public RecipeDetailsFragment(){}
 
@@ -69,6 +71,7 @@ public class RecipeDetailsFragment extends Fragment implements StepsAdapter.List
         mRecipeIngredientsTextView = rootView.findViewById(R.id.recipe_details_ingredients);
         mDetailsScrollView = rootView.findViewById(R.id.details_scroll_view);
         mRecipeIngredientsLabel = rootView.findViewById(R.id.recipe_details_ingredients_label);
+        mWidgetButton = rootView.findViewById(R.id.widget_button);
         recyclerView = rootView.findViewById(R.id.recipe_steps_recycler_view);
         layoutManager = new GridLayoutManager(getActivity(), 1);
         recyclerView.setLayoutManager(layoutManager);

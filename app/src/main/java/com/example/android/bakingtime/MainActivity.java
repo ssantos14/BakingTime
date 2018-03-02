@@ -133,7 +133,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(RECYCLER_VIEW_POSITION, layoutManager.onSaveInstanceState());
-        outState.putParcelable(DETAILS_STATE, RecipeDetailsFragment.layoutManager.onSaveInstanceState());
+        if(RecipeDetailsFragment.layoutManager != null) {
+            outState.putParcelable(DETAILS_STATE, RecipeDetailsFragment.layoutManager.onSaveInstanceState());
+        }
     }
 
     @Override

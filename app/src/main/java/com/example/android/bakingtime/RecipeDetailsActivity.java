@@ -2,6 +2,9 @@ package com.example.android.bakingtime;
 
 import android.app.FragmentManager;
 import android.app.LoaderManager;
+import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -18,6 +21,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RemoteViews;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -96,6 +100,7 @@ public class RecipeDetailsActivity extends AppCompatActivity implements LoaderMa
 
     public void makeWidget(View view){
         SetWidgetService.startActionSetWidget(this,recipeName,recipeInfo[2]);
+        Log.d(RecipeDetailsActivity.class.getSimpleName(),"MAKE WIDGET CLICKED, SHOULD BE STARTING ACTION SET WIDGET: " + recipeName);
     }
 
 }
