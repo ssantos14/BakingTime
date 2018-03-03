@@ -24,7 +24,8 @@ import static com.example.android.bakingtime.RecipeDetailsActivity.START_ID_TAG;
 import static com.example.android.bakingtime.ui.RecipeListFragment.layoutManager;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
-        RecipeListFragment.OnRecipeSelectedListener,RecipeDetailsFragment.OnStepSelectedListener{
+        RecipeListFragment.OnRecipeSelectedListener,RecipeDetailsFragment.OnStepSelectedListener,
+        RecipeDetailsFragment.OnWidgetButtonClickListener{
     private static final int RECIPES_LOADER_ID = 29;
     public static final String[] RECIPES_PROJECTION = {
             RecipesDataContract.RecipeEntry.COLUMN_RECIPE_NAME,
@@ -171,8 +172,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         startActivity(startStepDetailsActivityIntent);
     }
 
-    public void makeWidget(View view){
+    @Override
+    public void widgetButtonSelected(View view) {
         SetWidgetService.startActionSetWidget(this,recipeName,mRecipeInfo[2]);
     }
-
 }

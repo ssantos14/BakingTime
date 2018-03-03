@@ -31,7 +31,8 @@ import com.example.android.bakingtime.ui.RecipeDetailsFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class RecipeDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,RecipeDetailsFragment.OnStepSelectedListener{
+public class RecipeDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
+        RecipeDetailsFragment.OnStepSelectedListener, RecipeDetailsFragment.OnWidgetButtonClickListener{
     private static final int STEPS_LOADER_ID = 776;
     public static final String[] STEPS_PROJECTION = {
             RecipesDataContract.StepEntry._ID,
@@ -98,9 +99,9 @@ public class RecipeDetailsActivity extends AppCompatActivity implements LoaderMa
         startActivity(startStepDetailsActivityIntent);
     }
 
-    public void makeWidget(View view){
+    @Override
+    public void widgetButtonSelected(View view) {
         SetWidgetService.startActionSetWidget(this,recipeName,recipeInfo[2]);
-        Log.d(RecipeDetailsActivity.class.getSimpleName(),"MAKE WIDGET CLICKED, SHOULD BE STARTING ACTION SET WIDGET: " + recipeName);
     }
 
 }
