@@ -13,6 +13,7 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import com.example.android.bakingtime.MainActivity;
 import com.example.android.bakingtime.R;
 import com.example.android.bakingtime.RecipeDetailsActivity;
 import com.example.android.bakingtime.RecipesAdapter;
+import com.example.android.bakingtime.SetWidgetService;
 import com.example.android.bakingtime.StepDetailsActivity;
 import com.example.android.bakingtime.StepsAdapter;
 
@@ -48,13 +50,19 @@ public class RecipeDetailsFragment extends Fragment implements StepsAdapter.List
         void onStepSelected(int position,int step, int startId, int endId);
     }
 
+    OnWidgetButtonClickListener mWidgetCallback;
+    public interface OnWidgetButtonClickListener{
+        void widgetButtonSelected(View view);
+    }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
             mCallback = (OnStepSelectedListener) activity;
+            mWidgetCallback = (OnWidgetButtonClickListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnStepSelectedListener");
+            throw new ClassCastException(activity.toString() + " must implement OnStepSelectedListener and OnWidgetButtonClickListener");
         }
     }
 
@@ -72,6 +80,12 @@ public class RecipeDetailsFragment extends Fragment implements StepsAdapter.List
         mDetailsScrollView = rootView.findViewById(R.id.details_scroll_view);
         mRecipeIngredientsLabel = rootView.findViewById(R.id.recipe_details_ingredients_label);
         mWidgetButton = rootView.findViewById(R.id.widget_button);
+        mWidgetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mWidgetCallback.widgetButtonSelected(view);
+            }
+        });
         recyclerView = rootView.findViewById(R.id.recipe_steps_recycler_view);
         layoutManager = new GridLayoutManager(getActivity(), 1);
         recyclerView.setLayoutManager(layoutManager);
@@ -87,5 +101,6 @@ public class RecipeDetailsFragment extends Fragment implements StepsAdapter.List
         mRecipeIngredientsTextView.setText(recipeInfo[2]);
         mStepsAdapter.setStepsCursor(cursor);
     }
+
 
 }
