@@ -42,6 +42,9 @@ public class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFac
     //called on start and when notifyAppWidgetViewDataChanged is called
     @Override
     public void onDataSetChanged() {
+        try{
+            mRecipeName = RecipeDetailsFragment.mRecipeNameTextView.getText().toString();
+        }catch(Exception e){}
         Log.d(ListRemoteViewsFactory.class.getSimpleName(),"GOT TO DATA SET CHANGED: " + mRecipeName);
         Uri RECIPES_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_RECIPES).build();
         String selection = "name=?";
