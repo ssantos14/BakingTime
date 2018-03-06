@@ -10,6 +10,8 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import com.example.android.bakingtime.ui.RecipeDetailsFragment;
+
 import static com.example.android.bakingtime.data.RecipesDataContract.BASE_CONTENT_URI;
 import static com.example.android.bakingtime.data.RecipesDataContract.PATH_RECIPES;
 
@@ -40,7 +42,7 @@ public class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFac
     //called on start and when notifyAppWidgetViewDataChanged is called
     @Override
     public void onDataSetChanged() {
-        // Get all plant info ordered by creation time
+        Log.d(ListRemoteViewsFactory.class.getSimpleName(),"GOT TO DATA SET CHANGED: " + mRecipeName);
         Uri RECIPES_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_RECIPES).build();
         String selection = "name=?";
         String[] selectionArgs = {mRecipeName};
