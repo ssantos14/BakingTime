@@ -60,9 +60,8 @@ public class RecipeDetailsFragment extends Fragment implements StepsAdapter.List
         super.onAttach(activity);
         try {
             mCallback = (OnStepSelectedListener) activity;
-            mWidgetCallback = (OnWidgetButtonClickListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnStepSelectedListener and OnWidgetButtonClickListener");
+            throw new ClassCastException(activity.toString() + " must implement OnStepSelectedListener");
         }
     }
 

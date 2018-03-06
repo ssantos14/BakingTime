@@ -176,6 +176,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void widgetButtonSelected(View view) {
-        SetWidgetService.startActionUpdateWidget(this,recipeName);
+        SetWidgetService.startActionUpdateWidget(this);
     }
 }

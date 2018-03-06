@@ -27,13 +27,11 @@ public class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFac
 
     public ListRemoteViewsFactory(Context applicationContext, String name) {
         mContext = applicationContext;
-        Log.d(ListWidgetService.class.getSimpleName(),"GOT TO LIST REMOTE VIEW FACTORY: " + name );
         if(!TextUtils.isEmpty(name)) {
             mRecipeName = name;
         }else {
             mRecipeName = "Nutella Pie";
         }
-        Log.d(ListWidgetService.class.getSimpleName(),"GOT TO LIST REMOTE VIEW FACTORY: " + mRecipeName );
     }
 
     @Override
@@ -45,7 +43,6 @@ public class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFac
         try{
             mRecipeName = RecipeDetailsFragment.mRecipeNameTextView.getText().toString();
         }catch(Exception e){}
-        Log.d(ListRemoteViewsFactory.class.getSimpleName(),"GOT TO DATA SET CHANGED: " + mRecipeName);
         Uri RECIPES_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_RECIPES).build();
         String selection = "name=?";
         String[] selectionArgs = {mRecipeName};
