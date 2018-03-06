@@ -101,7 +101,7 @@ public class RecipeDetailsActivity extends AppCompatActivity implements LoaderMa
 
     @Override
     public void widgetButtonSelected(View view) {
-        SetWidgetService.startActionSetWidget(this,recipeName,recipeInfo[2]);
+        SetWidgetService.startActionUpdateWidget(this);
     }
 
 }

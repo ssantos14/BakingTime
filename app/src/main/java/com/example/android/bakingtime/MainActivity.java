@@ -2,6 +2,8 @@ package com.example.android.bakingtime;
 
 import android.app.FragmentManager;
 import android.app.LoaderManager;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -174,6 +176,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void widgetButtonSelected(View view) {
-        SetWidgetService.startActionSetWidget(this,recipeName,mRecipeInfo[2]);
+        SetWidgetService.startActionUpdateWidget(this);
     }
 }
