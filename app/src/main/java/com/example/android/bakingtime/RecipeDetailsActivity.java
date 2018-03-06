@@ -5,9 +5,11 @@ import android.app.LoaderManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
@@ -101,6 +103,12 @@ public class RecipeDetailsActivity extends AppCompatActivity implements LoaderMa
 
     @Override
     public void widgetButtonSelected(View view) {
+        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(R.string.widget_recipe), recipeName);
+        editor.commit();
+        String recipe = sharedPref.getString(getString(R.string.widget_recipe), "Nutella Pie");
+        Log.d(MainActivity.class.getSimpleName(), "Changed desired recipe to: " + recipe);
         SetWidgetService.startActionUpdateWidget(this);
     }
 

@@ -8,4 +8,6 @@
     <string name="widget_make">Make Widget</string>
     <string name="no_video">No video available for this step</string>
     <string name="no_widget">No Recipe To Show</string>
+    <string name="preference_file_key">com.example.bakingtime.PREFERENCE_FILE_KEY</string>
+    <string name="widget_recipe">Nutella Pie</string>
 </resources>
