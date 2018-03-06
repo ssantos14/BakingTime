@@ -2,9 +2,11 @@ package com.example.android.bakingtime;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -40,9 +42,11 @@ public class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFac
     //called on start and when notifyAppWidgetViewDataChanged is called
     @Override
     public void onDataSetChanged() {
-        try{
-            mRecipeName = RecipeDetailsFragment.mRecipeNameTextView.getText().toString();
-        }catch(Exception e){}
+        String prefKey = mContext.getResources().getString(R.string.preference_file_key);
+        SharedPreferences sharedPref = mContext.getSharedPreferences(prefKey,Context.MODE_PRIVATE);
+        String widgetRecipe = mContext.getResources().getString(R.string.widget_recipe);
+        mRecipeName = sharedPref.getString(widgetRecipe,"Nutella Pie");
+        Log.d(ListRemoteViewsFactory.class.getSimpleName(),"Desired recipe name: " + mRecipeName);
         Uri RECIPES_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_RECIPES).build();
         String selection = "name=?";
         String[] selectionArgs = {mRecipeName};

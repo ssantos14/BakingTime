@@ -52,7 +52,7 @@ import static com.example.android.bakingtime.MainActivity.STEPS_LOADER_ID;
 import static com.example.android.bakingtime.MainActivity.STEPS_PROJECTION;
 
 public class StepDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
-        ExoPlayer.EventListener,RecipeDetailsFragment.OnStepSelectedListener{
+        ExoPlayer.EventListener,RecipeDetailsFragment.OnStepSelectedListener,RecipeDetailsFragment.OnWidgetButtonClickListener{
     @BindView(R.id.description) TextView mDescriptionTextView;
     @BindView(R.id.placeholder) ImageView mNoVideoMessage;
     @BindView(R.id.player_view) SimpleExoPlayerView mPlayerView;
@@ -337,5 +337,8 @@ public class StepDetailsActivity extends AppCompatActivity implements LoaderMana
         lastId = endId;
         getLoaderManager().restartLoader(STEP_INFO_LOADER_ID,null,this);
     }
+
+    @Override
+    public void widgetButtonSelected(View view) {}
 
 }
